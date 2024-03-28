@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Category } from '../schemas/book.schema';
 

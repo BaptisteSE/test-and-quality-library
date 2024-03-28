@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+
 import {Body, Controller, Delete, Get, Param, Post, Put, } from '@nestjs/common';
   import { BookService } from './book.service';
   import { CreateBookDto } from './dto/create-book.dto';

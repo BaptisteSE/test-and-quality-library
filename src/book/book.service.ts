@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
@@ -16,7 +17,7 @@ export class BookService {
   }
 
   async create(book: Book): Promise<Book> {
-    if(!this.isValid(book)){
+    if (!this.isValid(book)) {
       return undefined;
     }
 
@@ -45,7 +46,7 @@ export class BookService {
     return await this.bookModel.findByIdAndDelete(id);
   }
 
-  isValid(book: Book){
+  isValid(book: Book) {
     return book.title != undefined;
   }
 }
