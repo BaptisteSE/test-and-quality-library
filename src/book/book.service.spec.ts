@@ -9,7 +9,7 @@ describe('BookService', () => {
 
     const createdBook = {
         _id: '124626',
-        user: 'zzgrjgiods,vp',
+        user: 'updatedUser',
         title: 'New Book',
         description: 'Book Description',
         author : 'Author',
@@ -28,12 +28,14 @@ describe('BookService', () => {
     };
 
     const mockDB = {
-        create: jest.fn().mockResolvedValue(createdBook),
-        find: jest.fn().mockResolvedValue([createdBook]),
-        findById: jest.fn().mockResolvedValue(createdBook),
-        findOneAndUpdate: jest.fn().mockResolvedValue(updatedBook),
-        findByIdAndDelete: jest.fn().mockResolvedValue(createdBook)
+      create: jest.fn().mockResolvedValue(createdBook),
+      find: jest.fn().mockResolvedValue([createdBook]),
+      findById: jest.fn().mockResolvedValue(createdBook),
+      findByIdAndDelete: jest.fn().mockResolvedValue(createdBook),
+      updateById: jest.fn().mockResolvedValue(updatedBook),
+      findByIdAndUpdate: jest.fn().mockResolvedValue(updatedBook)
     }
+  
 
     describe('create', () => {
         it('should create and return a book', async () => {
@@ -87,6 +89,32 @@ describe('BookService', () => {
 
           expect(result).toEqual(createdBook);
           expect(mockDB.findByIdAndDelete).toHaveBeenCalledWith('124626');
+      });
+    });
+
+    describe('updateById', () => {
+      it('should update a book by id', async () => {
+          const updatedInfo = {
+              title: 'Updated Book',
+              description: 'Updated Description', 
+              author: 'Updated Author',
+              price: 200,
+              category: Category.CALSSICS
+          };
+
+          mockDB.findByIdAndUpdate = jest.fn().mockImplementation((id, book) => {
+              return {
+                  ...createdBook,
+                  ...book,
+                  _id: id
+              };
+          });
+
+          bookService = new BookService(mockDB as unknown as mongoose.Model<Book>);
+
+          const result = await bookService.updateById('124626', updatedInfo as Book);
+
+          expect(result).toEqual(updatedBook);
       });
     });
   });
