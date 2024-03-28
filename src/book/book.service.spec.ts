@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import { BookService } from './book.service';
 import { Book, Category } from './schemas/book.schema';
+import { NotFoundException } from '@nestjs/common';
 
 describe('BookService', () => {
     let bookService: BookService;
@@ -16,9 +17,22 @@ describe('BookService', () => {
         category: Category.FANTASY
     };
 
+    const updatedBook = {
+      _id: '124626',
+      user: 'updatedUser',
+      title: 'Updated Book',
+      description: 'Updated Description',
+      author : 'Updated Author',
+      price: 200,
+      category: Category.CALSSICS
+    };
+
     const mockDB = {
         create: jest.fn().mockResolvedValue(createdBook),
-        find: jest.fn().mockResolvedValue([createdBook])
+        find: jest.fn().mockResolvedValue([createdBook]),
+        findById: jest.fn().mockResolvedValue(createdBook),
+        findOneAndUpdate: jest.fn().mockResolvedValue(updatedBook),
+        findByIdAndDelete: jest.fn().mockResolvedValue(createdBook)
     }
 
     describe('create', () => {
@@ -45,6 +59,35 @@ describe('BookService', () => {
           const result = await bookService.findAll();
 
           expect(result).toEqual([createdBook]);
+    });
+    
+    describe('getBook', () => {
+      it('should return a single book by id', async () => {
+          bookService = new BookService(mockDB as unknown as mongoose.Model<Book>);
+  
+          const result = await bookService.findById('124626');
+  
+          expect(result).toEqual(createdBook);
       });
+  
+      it('should throw NotFoundException if book is not found', async () => {
+          mockDB.findById.mockResolvedValueOnce(null);
+  
+          bookService = new BookService(mockDB as unknown as mongoose.Model<Book>);
+  
+          await expect(bookService.findById('nonexistentid')).rejects.toThrow(NotFoundException);
+      });
+    });
+
+    describe('deleteById', () => {
+      it('should delete a book by id', async () => {
+          bookService = new BookService(mockDB as unknown as mongoose.Model<Book>);
+
+          const result = await bookService.deleteById('124626');
+
+          expect(result).toEqual(createdBook);
+          expect(mockDB.findByIdAndDelete).toHaveBeenCalledWith('124626');
+      });
+    });
   });
 });
